@@ -2,18 +2,14 @@
 
 FROM mcr.microsoft.com/dotnet/aspnet:5.0 AS base
 WORKDIR /app
+ENV TZ=Asia/Shanghai
 EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /src
-COPY ["azure.devops.notify.dingtalk.robots/azure.devops.notify.dingtalk.robots.csproj", "azure.devops.notify.dingtalk.robots/"]
-RUN dotnet restore "azure.devops.notify.dingtalk.robots/azure.devops.notify.dingtalk.robots.csproj"
-COPY . .
+COPY src/azure.devops.notify.dingtalk.robots .
 WORKDIR "/src/azure.devops.notify.dingtalk.robots"
-RUN dotnet build "azure.devops.notify.dingtalk.robots.csproj" -c Release -o /app/build
-
-FROM build AS publish
-RUN dotnet publish "azure.devops.notify.dingtalk.robots.csproj" -c Release -o /app/publish
+RUN dotnet publish -c Release -o /app/publish -nologo -v:q -clp:NoSummary
 
 FROM base AS final
 WORKDIR /app
