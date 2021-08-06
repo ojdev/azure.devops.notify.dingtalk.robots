@@ -26,8 +26,8 @@ jobs:
       id: docker_build
       uses: docker/build-push-action@v2.6.1
       with:
-        context: ./
-        file: ./Dockerfile
+        context: ./azure.devops.notify.dingtalk.robots
+        file: ./azure.devops.notify.dingtalk.robots/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:latest
 
