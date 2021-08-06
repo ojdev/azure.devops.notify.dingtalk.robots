@@ -25,6 +25,7 @@ jobs:
         context: ./
         file: ./src/azure.devops.notify.dingtalk.robots/Dockerfile
         push: true
+        secrets: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:latest
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
