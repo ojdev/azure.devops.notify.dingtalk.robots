@@ -19,12 +19,16 @@ jobs:
       with:
         Username: ${{ secrets.DOCKER_HUB_USERNAME }}
         Password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    - name: Docker Setup Buildx
+      # You may pin to the exact commit or the version.
+      # uses: docker/setup-buildx-action@abe5d8f79a1606a2d3e218847032f3f2b1726ab0
+      uses: docker/setup-buildx-action@v1.5.1
     - name: Build and push
       uses: docker/build-push-action@v2.6.1
       with:
         context: ./
         file: ./src/azure.devops.notify.dingtalk.robots/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}/devops.to.dingtalk.robots:latest
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:latest
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
