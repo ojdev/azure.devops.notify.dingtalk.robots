@@ -9,7 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:5.0.102-ca-patch-buster-slim AS build
 WORKDIR /src
 COPY src/azure.devops.notify.dingtalk.robots .
 WORKDIR "/src/azure.devops.notify.dingtalk.robots"
-RUN dotnet publish -c Release -o /app/publish -nologo -v:q -clp:NoSummary
+RUN dotnet publish -c Release -o /app/publish
 
 FROM base AS final
 WORKDIR /app
