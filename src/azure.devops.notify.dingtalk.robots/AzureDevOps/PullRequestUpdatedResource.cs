@@ -4,7 +4,7 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
 {
     public class PullRequestUpdatedResource : PullRequestCreatedResource
     {
-        public DateTimeOffset? CreationDate { get; set; }
-        public DateTimeOffset? ClosedDate { get; set; }
+        public DateTime? CreationDate { get; set; }
+        public DateTime? ClosedDate { get; set; }
     }
 }

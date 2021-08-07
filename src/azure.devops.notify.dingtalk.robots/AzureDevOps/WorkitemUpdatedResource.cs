@@ -14,7 +14,7 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
         public int Rev { get; set; }
         public string Url { get; set; }
         public RevisedBy RevisedBy { get; set; }
-        public DateTimeOffset? RevisedDate { get; set; }
+        public DateTime? RevisedDate { get; set; }
         public Dictionary<string, ValueChangeModel> Fields { get; set; }
         [JsonProperty("_links")]
         public Dictionary<string, HrefModel> Links { get; set; }

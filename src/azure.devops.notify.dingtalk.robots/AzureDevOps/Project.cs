@@ -9,6 +9,6 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
         public string Url { get; set; }
         public string State { get; set; }
         public string Visibility { get; set; }
-        public DateTimeOffset? LastUpdateTime { get; set; }
+        public DateTime? LastUpdateTime { get; set; }
     }
 }

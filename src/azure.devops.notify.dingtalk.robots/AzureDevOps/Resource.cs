@@ -6,8 +6,8 @@
         //public int Id { get; set; }
         //public string BuildNumber { get; set; }
         //public string Url { get; set; }
-        //public DateTimeOffset? StartTime { get; set; }
-        //public DateTimeOffset? FinishTime { get; set; }
+        //public DateTime? StartTime { get; set; }
+        //public DateTime? FinishTime { get; set; }
         //public string Reason { get; set; }
         //public string Status { get; set; }
         //public string DropLocation { get; set; }

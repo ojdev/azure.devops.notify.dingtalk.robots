@@ -29,6 +29,6 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
         public T Resource { get; set; }
         public string ResourceVersion { get; set; }
         public Dictionary<string, IdModel> ResourceContainers { get; set; }
-        public DateTimeOffset? CreatedDate { get; set; }
+        public DateTime? CreatedDate { get; set; }
     }
 }
