@@ -2,7 +2,7 @@
 {
     public class ValueChangeModel
     {
-        public string OldValue { get; set; }
-        public string NewValue { get; set; }
+        public object OldValue { get; set; }
+        public object NewValue { get; set; }
     }
 }
