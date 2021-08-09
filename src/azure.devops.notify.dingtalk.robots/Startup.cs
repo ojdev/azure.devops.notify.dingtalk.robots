@@ -20,7 +20,6 @@ namespace azure.devops.notify.dingtalk.robots
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers()
                 .AddNewtonsoftJson();
             services.AddScoped<IDingTalkService, DingTalkService>();
@@ -28,12 +27,12 @@ namespace azure.devops.notify.dingtalk.robots
             {
                 c.PostProcess = document =>
                 {
-                    document.Info.Title = "AzureDevOps的钉钉通知";
+                    document.Info.Title = "AzureDevOps To Dingtalk Notify";
                     document.Info.Version = "v1";
-                    document.Info.Description = "AzureDevOps的钉钉通知";
+                    document.Info.Description = "AzureDevOps To Dingtalk Notify";
                     document.Info.Contact = new OpenApiContact
                     {
-                        Name = "鹿径",
+                        Name = "lujing.tech",
                         Email = "admin@lujing.tech",
                         Url = "https://www.lujing.tech/"
                     };
