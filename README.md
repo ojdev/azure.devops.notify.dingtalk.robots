@@ -143,7 +143,153 @@
     "createdDate": "2021-08-07T15:41:56.5943909Z"
 }
 ```
+更新 
+```json
+{
+  "subscriptionId": "52cdbf41-b885-4e97-bdba-16410cec4f35",
+  "notificationId": 12,
+  "id": "e4c446d0-f292-4d79-b396-1d40414582ae",
+  "eventType": "workitem.updated",
+  "publisherId": "tfs",
+  "message": {
+    "text": "任务 #7126 (交按二期【序号16：列表优化】)由 张路飞 更新\r\n(https://team.lujing.tech/web/wi.aspx?pcguid=196f1fb9-5cca-476e-bf6b-1bfc354d09c7&id=7126)",
+    "html": "<a href=\"https://team.lujing.tech/web/wi.aspx?pcguid=196f1fb9-5cca-476e-bf6b-1bfc354d09c7&amp;id=7126\">任务 #7126</a> (交按二期【序号16：列表优化】)由 张路飞 更新",
+    "markdown": "[任务 #7126](https://team.lujing.tech/web/wi.aspx?pcguid=196f1fb9-5cca-476e-bf6b-1bfc354d09c7&id=7126) (交按二期【序号16：列表优化】)由 张路飞 更新"
+  },
+  "detailedMessage": {
+    "text": "任务 #7126 (交按二期【序号16：列表优化】)由 张路飞 更新\r\n(https://team.lujing.tech/web/wi.aspx?pcguid=196f1fb9-5cca-476e-bf6b-1bfc354d09c7&id=7126)\r\n\r\n- 新标题: 交按二期【序号16：列表优化】\r\n",
+    "html": "<a href=\"https://team.lujing.tech/web/wi.aspx?pcguid=196f1fb9-5cca-476e-bf6b-1bfc354d09c7&amp;id=7126\">任务 #7126</a> (交按二期【序号16：列表优化】)由 张路飞 更新<ul>\r\n<li>新标题: 交按二期【序号16：列表优化】</li></ul>",
+    "markdown": "[任务 #7126](https://team.lujing.tech/web/wi.aspx?pcguid=196f1fb9-5cca-476e-bf6b-1bfc354d09c7&id=7126) (交按二期【序号16：列表优化】)由 张路飞 更新\r\n\r\n* 新标题: 交按二期【序号16：列表优化】\r\n"
+  },
+  "resource": {
+    "id": 2,
+    "workItemId": 7126,
+    "rev": 2,
+    "revisedBy": {
+      "id": "8b0e703c-928a-43b1-b2e8-bd4b69f559a9",
+      "name": "张路飞 <LUJING-DEVOPS\\zhanglufei>",
+      "displayName": "张路飞",
+      "url": "https://team.lujing.tech/NewSoftCollection/_apis/Identities/8b0e703c-928a-43b1-b2e8-bd4b69f559a9",
+      "_links": {
+        "avatar": {
+          "href": "https://team.lujing.tech/NewSoftCollection/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMjg5MDE5OTczNS0zOTc0Mjc5MjA5LTE5ODA3NTQyMjItMTAzNA"
+        }
+      },
+      "uniqueName": "LUJING-DEVOPS\\zhanglufei",
+      "imageUrl": "https://team.lujing.tech/NewSoftCollection/_apis/GraphProfile/MemberAvatars/win.Uy0xLTUtMjEtMjg5MDE5OTczNS0zOTc0Mjc5MjA5LTE5ODA3NTQyMjItMTAzNA",
+      "descriptor": "win.Uy0xLTUtMjEtMjg5MDE5OTczNS0zOTc0Mjc5MjA5LTE5ODA3NTQyMjItMTAzNA"
+    },
+    "revisedDate": "9999-01-01T00:00:00Z",
+    "fields": {
+      "System.Rev": {
+        "oldValue": 1,
+        "newValue": 2
+      },
+      "System.AuthorizedDate": {
+        "oldValue": "2021-08-09T03:44:58.35Z",
+        "newValue": "2021-08-09T05:19:36.39Z"
+      },
+      "System.RevisedDate": {
+        "oldValue": "2021-08-09T05:19:36.39Z",
+        "newValue": "9999-01-01T00:00:00Z"
+      },
+      "System.ChangedDate": {
+        "oldValue": "2021-08-09T03:44:58.35Z",
+        "newValue": "2021-08-09T05:19:36.39Z"
+      },
+      "System.Watermark": {
+        "oldValue": 63503,
+        "newValue": 63528
+      },
+      "System.Title": {
+        "oldValue": "交按二期【列表优化】",
+        "newValue": "交按二期【序号16：列表优化】"
+      }
+    },
+    "_links": {
+      "self": {
+        "href": "https://team.lujing.tech/NewSoftCollection/4993cbb2-cf7e-4796-9844-9a36b1aec4b3/_apis/wit/workItems/7126/updates/2"
+      },
+      "workItemUpdates": {
+        "href": "https://team.lujing.tech/NewSoftCollection/4993cbb2-cf7e-4796-9844-9a36b1aec4b3/_apis/wit/workItems/7126/updates"
+      },
+      "parent": {
+        "href": "https://team.lujing.tech/NewSoftCollection/4993cbb2-cf7e-4796-9844-9a36b1aec4b3/_apis/wit/workItems/7126"
+      },
+      "html": {
+        "href": "https://team.lujing.tech/web/wi.aspx?pcguid=196f1fb9-5cca-476e-bf6b-1bfc354d09c7&id=7126"
+      }
+    },
+    "url": "https://team.lujing.tech/NewSoftCollection/4993cbb2-cf7e-4796-9844-9a36b1aec4b3/_apis/wit/workItems/7126/updates/2",
+    "revision": {
+      "id": 7126,
+      "rev": 2,
+      "fields": {
+        "System.AreaPath": "XXXProject\\产品区域",
+        "System.TeamProject": "XXXProject",
+        "System.IterationPath": "XXXProject\\交易按揭权证迭代\\交易按揭权证第二期",
+        "System.WorkItemType": "任务",
+        "System.State": "新建",
+        "System.Reason": "新建",
+        "System.AssignedTo": "崔旭东 <LUJING-DEVOPS\\cuixudong>",
+        "System.CreatedDate": "2021-08-09T03:44:58.35Z",
+        "System.CreatedBy": "张路飞 <LUJING-DEVOPS\\zhanglufei>",
+        "System.ChangedDate": "2021-08-09T05:19:36.39Z",
+        "System.ChangedBy": "张路飞 <LUJING-DEVOPS\\zhanglufei>",
+        "System.CommentCount": 0,
+        "System.Title": "交按二期【序号16：列表优化】",
+        "Microsoft.VSTS.Scheduling.OriginalEstimate": 16.0,
+        "Microsoft.VSTS.Common.Activity": "开发",
+        "Microsoft.VSTS.Common.StateChangeDate": "2021-08-09T03:44:58.35Z",
+        "Microsoft.VSTS.Common.Priority": 3,
+        "Custom.923ac41b-2afe-42f9-94d2-e27b33027806": "2021-08-10T16:00:00Z",
+        "Custom.7651019e-320a-4988-b86f-a5cdef9a150a": "2021-08-15T16:00:00Z",
+        "System.Description": "<div><span>新增类型：已结案<br></span><div>取值逻辑：已结案的数据<br></div><span>结案数据中显示：待结案的数据</span><br></div>",
+        "System.Parent": 6453
+      },
+      "relations": [
+        {
+          "rel": "System.LinkTypes.Hierarchy-Reverse",
+          "url": "https://team.lujing.tech/NewSoftCollection/4993cbb2-cf7e-4796-9844-9a36b1aec4b3/_apis/wit/workItems/6453",
+          "attributes": {
+            "isLocked": false,
+            "name": "父级"
+          }
+        }
+      ],
+      "_links": {
+        "self": {
+          "href": "https://team.lujing.tech/NewSoftCollection/4993cbb2-cf7e-4796-9844-9a36b1aec4b3/_apis/wit/workItems/7126/revisions/2"
+        },
+        "workItemRevisions": {
+          "href": "https://team.lujing.tech/NewSoftCollection/4993cbb2-cf7e-4796-9844-9a36b1aec4b3/_apis/wit/workItems/7126/revisions"
+        },
+        "parent": {
+          "href": "https://team.lujing.tech/NewSoftCollection/4993cbb2-cf7e-4796-9844-9a36b1aec4b3/_apis/wit/workItems/7126"
+        }
+      },
+      "url": "https://team.lujing.tech/NewSoftCollection/4993cbb2-cf7e-4796-9844-9a36b1aec4b3/_apis/wit/workItems/7126/revisions/2"
+    }
+  },
+  "resourceVersion": "1.0",
+  "resourceContainers": {
+    "collection": {
+      "id": "196f1fb9-5cca-476e-bf6b-1bfc354d09c7",
+      "baseUrl": "https://team.lujing.tech/NewSoftCollection/"
+    },
+    "server": {
+      "id": "93ebc1b4-e4e0-4d53-8037-4905cd8a4cb6",
+      "baseUrl": "https://team.lujing.tech/"
+    },
+    "project": {
+      "id": "4993cbb2-cf7e-4796-9844-9a36b1aec4b3",
+      "baseUrl": "https://team.lujing.tech/NewSoftCollection/"
+    }
+  },
+  "createdDate": "2021-08-09T05:19:43.331295Z"
+}
 
+```
 添加任务项评论
 ```
 {

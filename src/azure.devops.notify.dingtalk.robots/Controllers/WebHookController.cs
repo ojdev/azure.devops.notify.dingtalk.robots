@@ -68,7 +68,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             string html = request.Resource.Links["html"].Href;
             var conent =
 @$"
-[{workItemType}] #{request.Resource.Id} {title}
+{workItemType} #{request.Resource.WorkItemId} {title}
 
 ---
 
@@ -89,10 +89,10 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> WorkitemUpdated([FromBody] ExpandoObject request)
+        public async Task<IActionResult> WorkitemUpdated([FromBody] WebHooksRequestInputDto request)
         {
-            _logger.LogInformation(JsonConvert.SerializeObject(request));
-            return Ok(await _dingTalkService.Markdown("", ""));
+            await _dingTalkService.Markdown("", request.DetailedMessage.MarkDown);
+            return Ok();
         }
     }
 }

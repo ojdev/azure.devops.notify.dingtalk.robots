@@ -28,7 +28,9 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
     public class SystemResourceModel
     {
         public int Id { get; set; }
+        public int WorkItemId { get; set; }
         public int Rev { get; set; }
+        public RevisedBy RevisedBy { get; set; }
         public Dictionary<string, object> Fields { get; set; }
         [JsonProperty("_links")]
         public Dictionary<string, HrefModel> Links { get; set; }
