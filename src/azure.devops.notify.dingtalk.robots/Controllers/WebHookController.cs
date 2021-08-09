@@ -89,13 +89,13 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             stringBuilder.AppendLine($"#### [{workItemType}] #{workItemId} {state} [{title}]({html})");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine("---");
-            stringBuilder.AppendLine($"> 创建: {createdBy?.ToString()?.Split(' ')?[0]}");
+            stringBuilder.AppendLine($"> 创建: @{createdBy?.ToString()?.Split(' ')?[0]}");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine($"> 修改: {revisedBy?.ToString()?.Split(' ')?[0]}");
             stringBuilder.AppendLine();
             if (assignedTo != null)
             {
-                stringBuilder.AppendLine($"> 指派: {assignedTo?.ToString()?.Split(' ')?[0]}");
+                stringBuilder.AppendLine($"> 指派: @{assignedTo?.ToString()?.Split(' ')?[0]}");
                 stringBuilder.AppendLine();
             }
             var description = request.Resource.Revision.Fields.GetValueOrDefault("System.Description");
