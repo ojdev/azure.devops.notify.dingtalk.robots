@@ -10,6 +10,8 @@ using System.Linq;
 using System.Collections;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Text;
+using System.Text.RegularExpressions;
 
 namespace azure.devops.notify.dingtalk.robots.Controllers
 {
@@ -65,7 +67,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             var changedBy = request.Resource.Fields["System.ChangedBy"];
             string StrNohtml = System.Text.RegularExpressions.Regex.Replace(history.ToString(), "<[^>]+>", "");
             StrNohtml = System.Text.RegularExpressions.Regex.Replace(StrNohtml, "&[^;]+;", "");
-            string html = request.Resource.Links["html"].Href;
+            //string html = request.Resource.Links["html"].Href;
             var conent =
 @$"
 {workItemType} #{request.Resource.WorkItemId} {title}
@@ -78,7 +80,6 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
 
 ---
 
-[去处理]({html})
 ";
             await _dingTalkService.Markdown(title, conent);
             return Ok();
@@ -91,7 +92,86 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         [HttpPost]
         public async Task<IActionResult> WorkitemUpdated([FromBody] WebHooksRequestInputDto request)
         {
-            await _dingTalkService.Markdown("", request.DetailedMessage.MarkDown);
+            var workItemId = request.Resource.WorkItemId;
+            var workItemType = request.Resource.Revision.Fields["System.WorkItemType"];
+            var state = request.Resource.Revision.Fields["System.State"];
+            var reason = request.Resource.Revision.Fields["System.Reason"];
+            var createdBy = request.Resource.Revision.Fields["System.CreatedBy"];
+            var assignedTo = request.Resource.Revision.Fields["System.AssignedTo"];
+            var revisedBy = request.Resource.RevisedBy.DisplayName;
+            var title = request.Resource.Revision.Fields["System.Title"].ToString();
+            string html = request.Resource.Links["html"].Href;
+
+            StringBuilder stringBuilder = new();
+            stringBuilder.AppendLine($"#### #{workItemId} [{title}]({html})");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("---");
+            stringBuilder.AppendLine($"> 类型: {workItemType}");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"> 状态: {state}");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"> 创建: {createdBy?.ToString()?.Split(' ')?[0]}");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"> 修改: {revisedBy?.ToString()?.Split(' ')?[0]}");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"> 指派: {assignedTo?.ToString()?.Split(' ')?[0]}");
+            stringBuilder.AppendLine();
+
+            var description = request.Resource.Revision.Fields.GetValueOrDefault("System.Description");
+            if (description != null)
+            {
+                stringBuilder.AppendLine("---");
+                stringBuilder.AppendLine($"描述");
+                stringBuilder.AppendLine($"> {Regex.Replace(Regex.Replace(description.ToString(), "<[^>]+>", ""), "&[^;]+;", "")}");
+                stringBuilder.AppendLine();
+            }
+
+            var changeStatus = request.Resource.Fields.GetValueOrDefault("System.State");
+            if (changeStatus != null)
+            {
+                try
+                {
+                    var ch = (ValueChangeModel)changeStatus;
+                    if (ch.OldValue != ch.NewValue)
+                    {
+                        stringBuilder.AppendLine("---");
+                        stringBuilder.AppendLine($"> 状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
+                        stringBuilder.AppendLine();
+                    }
+                }
+                catch
+                {
+                }
+            }
+            var changeAssignedTo = request.Resource.Fields.GetValueOrDefault("System.AssignedTo");
+            if (changeAssignedTo != null)
+            {
+                try
+                {
+                    var ch = (ValueChangeModel)changeAssignedTo;
+                    if (ch.OldValue != ch.NewValue)
+                    {
+                        stringBuilder.AppendLine("---");
+                        stringBuilder.AppendLine($"> 指派变更: {ch.OldValue} 更改为 @{ch.NewValue}");
+                        stringBuilder.AppendLine();
+                    }
+                }
+                catch
+                {
+                }
+            }
+
+            var history = request.Resource.Revision.Fields.GetValueOrDefault("System.History");
+            if (history != null)
+            {
+                var strNohtml = Regex.Replace(Regex.Replace(history.ToString(), "<[^>]+>", ""), "&[^;]+;", "");
+                stringBuilder.AppendLine("---");
+                stringBuilder.AppendLine($"{revisedBy?.ToString()?.Split(' ')?[0]} 写了讨论");
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine($"> {strNohtml}");
+                stringBuilder.AppendLine();
+            }
+            await _dingTalkService.Markdown($"{workItemType} #{workItemId} {title} {reason}", stringBuilder.ToString());
             return Ok();
         }
     }

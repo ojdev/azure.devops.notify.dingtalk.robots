@@ -21,7 +21,8 @@ namespace azure.devops.notify.dingtalk.robots
         public void ConfigureServices(IServiceCollection services)
         {
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson();
             services.AddScoped<IDingTalkService, DingTalkService>();
             services.AddOpenApiDocument(c =>
             {
