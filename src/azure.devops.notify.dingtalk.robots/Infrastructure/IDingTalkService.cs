@@ -13,7 +13,7 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
 {
     public interface IDingTalkService
     {
-        Task<string> Markdown(string title, string content);
+        Task<string> Markdown(string title, string content, bool atAll = false);
         void ActionCard(string title, string content, string workItemUrl);
     }
     public class DingTalkService : IDingTalkService
@@ -31,16 +31,27 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private IEnumerable<DevOpsMappingDingTalk> Mappings
+        private IEnumerable<Roboot> Roboots
         {
             get
             {
-                var mappings = _configuration.GetSection("Mappings").GetChildren().Select(c => new DevOpsMappingDingTalk
+                var mappings = _configuration.GetSection("reboots").GetChildren().Select(c => new Roboot
                 {
-                    DevOps = c["devops"],
-                    DingTalk = c["dingtalk"],
+                    Name = c["Name"],
                     Access_Token = c["access_token"],
                     Secret = c["secret"]
+                });
+                return mappings;
+            }
+        }
+        private IEnumerable<UserMapping> UserMappings
+        {
+            get
+            {
+                var mappings = _configuration.GetSection("UserMappings").GetChildren().Select(c => new UserMapping
+                {
+                    DevOps = c["devops"],
+                    DingTalk = c["dingtalk"]
                 });
                 return mappings;
             }
@@ -49,8 +60,8 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
         public void ActionCard(string title, string content, string workItemUrl)
         {
             var timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            var allPhones = Mappings.Select(t => new { t.DevOps, t.DingTalk }).Distinct();
-            foreach (var g in Mappings.GroupBy(t => new { t.Access_Token, t.Secret }))
+            var allUsers = UserMappings.Select(t => new { t.DevOps, t.DingTalk }).Distinct();
+            foreach (var g in Roboots.GroupBy(t => new { t.Access_Token, t.Secret }))
             {
                 var signMsg = timestamp + "\n" + g.Key.Secret;
                 var sign = DingTalkSignatureUtil.ComputeSignature(g.Key.Secret, signMsg);
@@ -58,7 +69,7 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
                 IDingTalkClient client = new DefaultDingTalkClient(url);
                 OapiRobotSendRequest request = new() { Msgtype = "actionCard" };
                 List<string> atPhones = new();
-                foreach (var d in allPhones)
+                foreach (var d in allUsers)
                 {
                     if (content.Contains($"@{d.DevOps}"))
                     {
@@ -93,11 +104,11 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
             }
         }
 
-        public async Task<string> Markdown(string title, string content)
+        public async Task<string> Markdown(string title, string content, bool atAll = false)
         {
             var timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            var allPhones = Mappings.Select(t => new { t.DevOps, t.DingTalk }).Distinct();
-            foreach (var g in Mappings.GroupBy(t => new { t.Access_Token, t.Secret }))
+            var allUsers = UserMappings.Select(t => new { t.DevOps, t.DingTalk }).Distinct();
+            foreach (var g in Roboots.GroupBy(t => new { t.Access_Token, t.Secret }))
             {
                 var signMsg = timestamp + "\n" + g.Key.Secret;
                 var sign = DingTalkSignatureUtil.ComputeSignature(g.Key.Secret, signMsg);
@@ -105,7 +116,7 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
                 IDingTalkClient client = new DefaultDingTalkClient(url);
                 OapiRobotSendRequest request = new() { Msgtype = "markdown" };
                 List<string> atPhones = new();
-                foreach (var d in allPhones)
+                foreach (var d in allUsers)
                 {
                     if (content.Contains($"@{d.DevOps}"))
                     {
@@ -113,7 +124,6 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
                         atPhones.Add(d.DingTalk);
                     }
                 }
-                content = content.Replace("_apis/wit/workItems/", "_workitems/edit/");
                 request.Markdown_ = new()
                 {
                     Title = title,
@@ -122,7 +132,7 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
                 request.At_ = new()
                 {
                     AtMobiles = atPhones,
-                    IsAtAll = false
+                    IsAtAll = atAll
                 };
                 var response = client.Execute(request);
                 _logger.LogInformation(response.Body);

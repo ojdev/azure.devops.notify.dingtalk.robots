@@ -47,29 +47,25 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             string repository = request.Resource.Repository.Name;
 
             StringBuilder stringBuilder = new();
-            stringBuilder.AppendLine($"#### [{createdBy} 创建了 {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} 分支的拉取请求]({html})");
+            stringBuilder.AppendLine($"#### [{createdBy} {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} 分支的拉取请求]({html})");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine("---");
             stringBuilder.AppendLine($"> 仓储: {repository}");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"> 标题: {createdBy?.ToString()?.Split(' ')?[0]}");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"{request.Resource.Title}");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"> 描述");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"{request.Resource.Description}");
+            stringBuilder.AppendLine("> ");
+            stringBuilder.AppendLine($"> 合并: {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} {request.Resource.MergeStatus}");
+            stringBuilder.AppendLine("> ");
+            stringBuilder.AppendLine($"> 状态: {request.Resource.Status}");
+            stringBuilder.AppendLine("> ");
 
             var reviews = request.Resource.Reviewers?.Select(t => $"@{t.displayName}").ToList() ?? new List<string>();
             if (reviews.Any())
             {
-                stringBuilder.AppendLine("---");
-                stringBuilder.AppendLine($"> 审阅者");
-                stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"{string.Join(' ', reviews)}");
-                stringBuilder.AppendLine();
+                stringBuilder.AppendLine($"> 审阅者: {string.Join(' ', reviews)}");
+                stringBuilder.AppendLine("> ");
             }
-
+            stringBuilder.AppendLine("---");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine(request.DetailedMessage.MarkDown);
             await _dingTalkService.Markdown(request.Resource.Title, stringBuilder.ToString());
             return Ok();
         }
@@ -161,6 +157,12 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                 stringBuilder.AppendLine();
             }
             await _dingTalkService.Markdown($"{workItemType} #{workItemId} {title} {reason}", stringBuilder.ToString());
+            return Ok();
+        }
+        [HttpPost]
+        public async Task<IActionResult> SendMessage(string title, string content, bool atAll = false)
+        {
+            await _dingTalkService.Markdown(title, content, atAll);
             return Ok();
         }
     }
