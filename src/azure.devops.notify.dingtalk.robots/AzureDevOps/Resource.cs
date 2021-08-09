@@ -36,5 +36,6 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
         public Dictionary<string, HrefModel> Links { get; set; }
         public SystemResourceModel Revision { get; set; }
         public string Url { get; set; }
+        public List<object> Relations { get; set; } = new List<object>();
     }
 }

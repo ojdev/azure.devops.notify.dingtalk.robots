@@ -28,60 +28,49 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
         /// <summary>
-        /// 创建拉取请求
+        /// 拉取请求
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> PullRequestCreated([FromBody] ExpandoObject request)
+        public async Task<IActionResult> RequestUpdated([FromBody] WebHooksRequestPullRequestUpdatedResource request)
         {
-            _logger.LogInformation(JsonConvert.SerializeObject(request));
-            return Ok(await _dingTalkService.Markdown("", ""));
-        }
-        /// <summary>
-        /// 拉取请求更新
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<IActionResult> PullRequestUpdated([FromBody] ExpandoObject request)
-        {
-            _logger.LogInformation(JsonConvert.SerializeObject(request));
-            return Ok(await _dingTalkService.Markdown("", ""));
-        }
-        /// <summary>
-        /// 工作项评论
-        /// </summary>
-        /// <param name="dto"></param>
-        /// <returns></returns>
-        [HttpPost]
-        public async Task<IActionResult> WorkitemCommented([FromBody] WebHooksRequestInputDto request)
-        {
-            //var resource = JsonConvert.DeserializeObject<SystemResourceModel>(request.FirstOrDefault(t => t.Key == "resource").Value.ToString());
-            var workItemType = request.Resource.Fields["System.WorkItemType"];
-            var state = request.Resource.Fields["System.State"];
-            var assignedTo = request.Resource.Fields["System.AssignedTo"];
-            var title = request.Resource.Fields["System.Title"].ToString();
-            var history = request.Resource.Fields["System.History"];
-            var changedDate = DateTime.Parse(request.Resource.Fields["System.ChangedDate"].ToString());
-            var changedBy = request.Resource.Fields["System.ChangedBy"];
-            string StrNohtml = System.Text.RegularExpressions.Regex.Replace(history.ToString(), "<[^>]+>", "");
-            StrNohtml = System.Text.RegularExpressions.Regex.Replace(StrNohtml, "&[^;]+;", "");
-            //string html = request.Resource.Links["html"].Href;
-            var conent =
-@$"
-{workItemType} #{request.Resource.WorkItemId} {title}
+            //var workItemId = request.Resource.WorkItemId;
+            //var workItemType = request.Resource.Revision.Fields["System.WorkItemType"];
+            //var state = request.Resource.Revision.Fields["System.State"];
+            //var reason = request.Resource.Revision.Fields["System.Reason"];
+            var createdBy = request.Resource.CreatedBy.DisplayName;
+            //var assignedTo = request.Resource.Revision.Fields["System.AssignedTo"];
+            //var revisedBy = request.Resource.RevisedBy.DisplayName;
+            //var title = request.Resource.Revision.Fields["System.Title"].ToString();
+            string html = request.Resource.Links["web"].Href;
+            string repository = request.Resource.Repository.Name;
 
----
+            StringBuilder stringBuilder = new();
+            stringBuilder.AppendLine($"#### [{createdBy} 创建了 {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} 分支的拉取请求]({html})");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("---");
+            stringBuilder.AppendLine($"> 仓储: {repository}");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"> 标题: {createdBy?.ToString()?.Split(' ')?[0]}");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"{request.Resource.Title}");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"> 描述");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine($"{request.Resource.Description}");
 
-@{changedBy} {changedDate:yyyy-MM-dd HH:MM} 说:
+            var reviews = request.Resource.Reviewers?.Select(t => $"@{t.displayName}").ToList() ?? new List<string>();
+            if (reviews.Any())
+            {
+                stringBuilder.AppendLine("---");
+                stringBuilder.AppendLine($"> 审阅者");
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine($"{string.Join(' ', reviews)}");
+                stringBuilder.AppendLine();
+            }
 
-{StrNohtml}
-
----
-
-";
-            await _dingTalkService.Markdown(title, conent);
+            await _dingTalkService.Markdown(request.Resource.Title, stringBuilder.ToString());
             return Ok();
         }
         /// <summary>
@@ -92,6 +81,11 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         [HttpPost]
         public async Task<IActionResult> WorkitemUpdated([FromBody] WebHooksRequestInputDto request)
         {
+            if (request.Resource.Relations.Any())
+            {
+                return Ok();
+            }
+
             var workItemId = request.Resource.WorkItemId;
             var workItemType = request.Resource.Revision.Fields["System.WorkItemType"];
             var state = request.Resource.Revision.Fields["System.State"];
