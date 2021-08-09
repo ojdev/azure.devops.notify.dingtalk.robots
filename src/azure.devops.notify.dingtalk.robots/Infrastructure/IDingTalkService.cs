@@ -32,11 +32,11 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private IEnumerable<Roboot> Roboots
+        private IEnumerable<Robot> Roboots
         {
             get
             {
-                var mappings = _configuration.GetSection("reboots").GetChildren().Select(c => new Roboot
+                var mappings = _configuration.GetSection("robots").GetChildren().Select(c => new Robot
                 {
                     Name = c["Name"],
                     Access_Token = c["access_token"],
