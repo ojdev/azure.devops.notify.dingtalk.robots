@@ -1,6 +1,6 @@
 # azure.devops.notify.dingtalk.robots
 
-
+docker-compose.yml
 ```yaml
 version: "2.0"
 services:
@@ -8,17 +8,43 @@ services:
     image: luacloud/devops.to.dingtalk.robots:latest
     container_name: dingtalk
     environment:
-      - TZ=Asia/Shanghai
-      - reboots:
-        - :
-          Name: DevOps通知群
-          access_token: 机器人的token
-          secret: 机器人的secret
-      - UserMappings:
-        - :
-          devops: 钉钉中的人名，与azuredevops中的一致
-          dingtalk: 钉钉里的手机号
-    restart: always
+      - TZ:Asia/Shanghai
+    volumes:
+      - ./appsettings.json:/app/appsettings.json
     ports:
-      - 18880:80
+      - 80:80
+```
+
+appsettings.json
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft": "Warning",
+      "Microsoft.Hosting.Lifetime": "Information"
+    }
+  },
+  "robots": [
+    {
+      "Name": "DevOps通知群",
+      "access_token": "xxx",
+      "secret": "xxx"
+    }
+  ],
+  "UserMappings": [
+    {
+      "devops": "ABC",
+      "dingtalk": "18000000001"
+    },
+    {
+      "devops": "BCD",
+      "dingtalk": "18000000003"
+    },
+    {
+      "devops": "DEF",
+      "dingtalk": "18000000002"
+    }
+  ]
+}
 ```
