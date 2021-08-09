@@ -3,8 +3,13 @@ using azure.devops.notify.dingtalk.robots.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Dynamic;
+using System.Linq;
+using System.Collections;
 using System.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace azure.devops.notify.dingtalk.robots.Controllers
 {
@@ -26,10 +31,10 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> PullRequestCreated([FromBody] WebHooksRequestPullRequestCreatedResource request)
+        public async Task<IActionResult> PullRequestCreated([FromBody] ExpandoObject request)
         {
             _logger.LogInformation(JsonConvert.SerializeObject(request));
-            return Ok(await _dingTalkService.Markdown());
+            return Ok(await _dingTalkService.Markdown("", ""));
         }
         /// <summary>
         /// 拉取请求更新
@@ -37,10 +42,10 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> PullRequestUpdated([FromBody] WebHooksRequestPullRequestUpdatedResource request)
+        public async Task<IActionResult> PullRequestUpdated([FromBody] ExpandoObject request)
         {
             _logger.LogInformation(JsonConvert.SerializeObject(request));
-            return Ok(await _dingTalkService.Markdown());
+            return Ok(await _dingTalkService.Markdown("", ""));
         }
         /// <summary>
         /// 工作项评论
@@ -48,115 +53,35 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> WorkitemCommented([FromBody] WebHooksRequestWorkitemCommentedResource request)
+        public async Task<IActionResult> WorkitemCommented([FromBody] WebHooksRequestInputDto request)
         {
-            _logger.LogInformation(JsonConvert.SerializeObject(request));
-            /* bug 的评论
-             {
-    "SubscriptionId": "ea7bd3d2-94e8-4dd7-9703-d7524beea45d",
-    "NotificationId": 1,
-    "Id": "4c19e2ca-d27c-4ed4-a69f-37ab2f2a95c7",
-    "EventType": "workitem.commented",
-    "PublisherId": "tfs",
-    "Message": {
-        "Text": "Bug #13 (创建一个bug) commented on by 欧俊\r\n(https://dev.azure.com/ouno/web/wi.aspx?pcguid=2245531e-4735-4f13-81d1-a4a33d5532a1&id=13)",
-        "Html": "<a href=\"https://dev.azure.com/ouno/web/wi.aspx?pcguid=2245531e-4735-4f13-81d1-a4a33d5532a1&amp;id=13\">Bug #13</a> (创建一个bug) commented on by 欧俊",
-        "MarkDown": "[Bug #13](https://dev.azure.com/ouno/web/wi.aspx?pcguid=2245531e-4735-4f13-81d1-a4a33d5532a1&id=13) (创建一个bug) commented on by 欧俊"
-    },
-    "DetailedMessage": {
-        "Text": "Bug #13 (创建一个bug) commented on by 欧俊\r\n(https://dev.azure.com/ouno/web/wi.aspx?pcguid=2245531e-4735-4f13-81d1-a4a33d5532a1&id=13)\r\n\r\n评论\r\n",
-        "Html": "<a href=\"https://dev.azure.com/ouno/web/wi.aspx?pcguid=2245531e-4735-4f13-81d1-a4a33d5532a1&amp;id=13\">Bug #13</a> (创建一个bug) commented on by 欧俊<br/><div>评论</div>",
-        "MarkDown": "[Bug #13](https://dev.azure.com/ouno/web/wi.aspx?pcguid=2245531e-4735-4f13-81d1-a4a33d5532a1&id=13) (创建一个bug) commented on by 欧俊\r\n\r\n评论\r\n"
-    },
-    "Resource": {
-        "Id": 13,
-        "Rev": 3,
-        "Fields": {
-            "System.AreaPath": {
-                "ValueKind": 3
-            },
-            "System.TeamProject": {
-                "ValueKind": 3
-            },
-            "System.IterationPath": {
-                "ValueKind": 3
-            },
-            "System.WorkItemType": {
-                "ValueKind": 3
-            },
-            "System.State": {
-                "ValueKind": 3
-            },
-            "System.Reason": {
-                "ValueKind": 3
-            },
-            "System.AssignedTo": {
-                "ValueKind": 3
-            },
-            "System.CreatedDate": {
-                "ValueKind": 3
-            },
-            "System.CreatedBy": {
-                "ValueKind": 3
-            },
-            "System.ChangedDate": {
-                "ValueKind": 3
-            },
-            "System.ChangedBy": {
-                "ValueKind": 3
-            },
-            "System.CommentCount": {
-                "ValueKind": 4
-            },
-            "System.Title": {
-                "ValueKind": 3
-            },
-            "Microsoft.VSTS.Common.Severity": {
-                "ValueKind": 3
-            },
-            "Microsoft.VSTS.Common.StateChangeDate": {
-                "ValueKind": 3
-            },
-            "Microsoft.VSTS.Common.Priority": {
-                "ValueKind": 4
-            },
-            "Microsoft.VSTS.Common.ValueArea": {
-                "ValueKind": 3
-            },
-            "System.History": {
-                "ValueKind": 3
-            },
-            "Microsoft.VSTS.TCM.SystemInfo": {
-                "ValueKind": 3
-            },
-            "Microsoft.VSTS.TCM.ReproSteps": {
-                "ValueKind": 3
-            },
-            "Microsoft.VSTS.Common.AcceptanceCriteria": {
-                "ValueKind": 3
-            }
-        },
-        "_links": null,
-        "Url": "https://dev.azure.com/ouno/66776c68-10ec-4679-9652-d001a718d37f/_apis/wit/workItems/13"
-    },
-    "ResourceVersion": "1.0",
-    "ResourceContainers": {
-        "collection": {
-            "Id": "2245531e-4735-4f13-81d1-a4a33d5532a1"
-        },
-        "account": {
-            "Id": "0da6820a-0c82-40bd-8b31-bc1bb2a21a35"
-        },
-        "project": {
-            "Id": "66776c68-10ec-4679-9652-d001a718d37f"
-        }
-    },
-    "CreatedDate": "2021-08-07T15:42:14.8870739Z"
-}
-            */
+            //var resource = JsonConvert.DeserializeObject<SystemResourceModel>(request.FirstOrDefault(t => t.Key == "resource").Value.ToString());
+            var workItemType = request.Resource.Fields["System.WorkItemType"];
+            var state = request.Resource.Fields["System.State"];
+            var assignedTo = request.Resource.Fields["System.AssignedTo"];
+            var title = request.Resource.Fields["System.Title"].ToString();
+            var history = request.Resource.Fields["System.History"];
+            var changedDate = DateTime.Parse(request.Resource.Fields["System.ChangedDate"].ToString());
+            var changedBy = request.Resource.Fields["System.ChangedBy"];
+            string StrNohtml = System.Text.RegularExpressions.Regex.Replace(history.ToString(), "<[^>]+>", "");
+            StrNohtml = System.Text.RegularExpressions.Regex.Replace(StrNohtml, "&[^;]+;", "");
+            string html = request.Resource.Links["html"].Href;
+            var conent =
+@$"
+[{workItemType}] #{request.Resource.Id} {title}
 
+---
 
-            return Ok(await _dingTalkService.Markdown());
+@{changedBy} {changedDate:yyyy-MM-dd HH:MM} 说:
+
+{StrNohtml}
+
+---
+
+[去处理]({html})
+";
+            await _dingTalkService.Markdown(title, conent);
+            return Ok();
         }
         /// <summary>
         /// 工作项更新
@@ -164,10 +89,10 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         /// <param name="dto"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> WorkitemUpdated([FromBody] WebHooksRequestWorkitemUpdatedResource request)
+        public async Task<IActionResult> WorkitemUpdated([FromBody] ExpandoObject request)
         {
             _logger.LogInformation(JsonConvert.SerializeObject(request));
-            return Ok(await _dingTalkService.Markdown());
+            return Ok(await _dingTalkService.Markdown("", ""));
         }
     }
 }

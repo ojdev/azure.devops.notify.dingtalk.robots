@@ -1,4 +1,8 @@
-﻿namespace azure.devops.notify.dingtalk.robots.AzureDevOps
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Dynamic;
+
+namespace azure.devops.notify.dingtalk.robots.AzureDevOps
 {
     public class Resource
     {
@@ -20,5 +24,14 @@
         //public WebHooksRequestResourceDefinition Definition { get; set; }
         //public WebHooksRequestResourceQueue Queue { get; set; }
         //public List<WebHooksRequestResourceRequest> Requests { get; set; }
+    }
+    public class SystemResourceModel
+    {
+        public int Id { get; set; }
+        public int Rev { get; set; }
+        public Dictionary<string, object> Fields { get; set; }
+        [JsonProperty("_links")]
+        public Dictionary<string, HrefModel> Links { get; set; }
+        public string Url { get; set; }
     }
 }
