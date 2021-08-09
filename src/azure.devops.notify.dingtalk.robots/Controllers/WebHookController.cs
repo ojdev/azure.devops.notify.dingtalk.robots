@@ -76,14 +76,14 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             }
 
             var workItemId = request.Resource.WorkItemId;
-            var workItemType = request.Resource.Revision.Fields["System.WorkItemType"];
-            var state = request.Resource.Revision.Fields["System.State"];
-            var reason = request.Resource.Revision.Fields["System.Reason"];
-            var createdBy = request.Resource.Revision.Fields["System.CreatedBy"];
-            var assignedTo = request.Resource.Revision.Fields["System.AssignedTo"];
+            var workItemType = request.Resource.Revision.Fields.GetValueOrDefault("System.WorkItemType");
+            var state = request.Resource.Revision.Fields.GetValueOrDefault("System.State");
+            var reason = request.Resource.Revision.Fields.GetValueOrDefault("System.Reason");
+            var createdBy = request.Resource.Revision.Fields.GetValueOrDefault("System.CreatedBy");
+            var assignedTo = request.Resource.Revision.Fields.GetValueOrDefault("System.AssignedTo");
             var revisedBy = request.Resource.RevisedBy.DisplayName;
-            var title = request.Resource.Revision.Fields["System.Title"].ToString();
-            string html = request.Resource.Links["html"].Href;
+            var title = request.Resource.Revision.Fields.GetValueOrDefault("System.Title")?.ToString();
+            string html = request.Resource.Links.GetValueOrDefault("html")?.Href;
 
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine($"#### [{workItemType}] #{workItemId} {state} [{title}]({html})");
