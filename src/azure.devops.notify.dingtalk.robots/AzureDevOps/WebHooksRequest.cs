@@ -16,7 +16,7 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
     {
         public string SubscriptionId { get; set; }
         public int NotificationId { get; set; }
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string EventType { get; set; }
         public string PublisherId { get; set; }
         public Message Message { get; set; }

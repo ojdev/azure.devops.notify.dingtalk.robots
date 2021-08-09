@@ -35,14 +35,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         [HttpPost]
         public async Task<IActionResult> RequestUpdated([FromBody] WebHooksRequestPullRequestUpdatedResource request)
         {
-            //var workItemId = request.Resource.WorkItemId;
-            //var workItemType = request.Resource.Revision.Fields["System.WorkItemType"];
-            //var state = request.Resource.Revision.Fields["System.State"];
-            //var reason = request.Resource.Revision.Fields["System.Reason"];
             var createdBy = request.Resource.CreatedBy.DisplayName;
-            //var assignedTo = request.Resource.Revision.Fields["System.AssignedTo"];
-            //var revisedBy = request.Resource.RevisedBy.DisplayName;
-            //var title = request.Resource.Revision.Fields["System.Title"].ToString();
             string html = request.Resource.Links["web"].Href;
             string repository = request.Resource.Repository.Name;
 
@@ -77,7 +70,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         [HttpPost]
         public async Task<IActionResult> WorkitemUpdated([FromBody] WebHooksRequestInputDto request)
         {
-            if (request.Resource.Relations.Any())
+            if (request.Resource.Relations != null)
             {
                 return Ok();
             }
