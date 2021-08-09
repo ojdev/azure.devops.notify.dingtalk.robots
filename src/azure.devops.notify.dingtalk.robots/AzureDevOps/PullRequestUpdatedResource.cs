@@ -6,5 +6,6 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
     {
         public DateTime? CreationDate { get; set; }
         public DateTime? ClosedDate { get; set; }
+        public int CodeReviewId { get; set; }
     }
 }

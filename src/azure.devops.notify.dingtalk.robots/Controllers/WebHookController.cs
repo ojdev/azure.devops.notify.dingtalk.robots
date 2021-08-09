@@ -36,11 +36,11 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         public async Task<IActionResult> RequestUpdated([FromBody] WebHooksRequestPullRequestUpdatedResource request)
         {
             var createdBy = request.Resource.CreatedBy.DisplayName;
-            string html = request.Resource.Links["web"].Href;
+            string html = request.Resource.Links.GetValueOrDefault("web")?.Href;
             string repository = request.Resource.Repository.Name;
 
             StringBuilder stringBuilder = new();
-            stringBuilder.AppendLine($"#### [{createdBy} {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} 分支的拉取请求]({html})");
+            stringBuilder.AppendLine($"#### [#{request.Resource.CodeReviewId} {createdBy} {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} 分支的拉取请求]({html})");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine("---");
             stringBuilder.AppendLine($"> 仓储: {repository}");
@@ -93,9 +93,11 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             stringBuilder.AppendLine();
             stringBuilder.AppendLine($"> 修改: {revisedBy?.ToString()?.Split(' ')?[0]}");
             stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"> 指派: {assignedTo?.ToString()?.Split(' ')?[0]}");
-            stringBuilder.AppendLine();
-
+            if (assignedTo != null)
+            {
+                stringBuilder.AppendLine($"> 指派: {assignedTo?.ToString()?.Split(' ')?[0]}");
+                stringBuilder.AppendLine();
+            }
             var description = request.Resource.Revision.Fields.GetValueOrDefault("System.Description");
             if (description != null)
             {
