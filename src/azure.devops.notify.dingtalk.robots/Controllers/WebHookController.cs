@@ -103,13 +103,9 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             string html = request.Resource.Links["html"].Href;
 
             StringBuilder stringBuilder = new();
-            stringBuilder.AppendLine($"#### #{workItemId} [{title}]({html})");
+            stringBuilder.AppendLine($"#### [{workItemType}] #{workItemId} {state} [{title}]({html})");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine("---");
-            stringBuilder.AppendLine($"> 类型: {workItemType}");
-            stringBuilder.AppendLine();
-            stringBuilder.AppendLine($"> 状态: {state}");
-            stringBuilder.AppendLine();
             stringBuilder.AppendLine($"> 创建: {createdBy?.ToString()?.Split(' ')?[0]}");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine($"> 修改: {revisedBy?.ToString()?.Split(' ')?[0]}");
@@ -121,8 +117,9 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             if (description != null)
             {
                 stringBuilder.AppendLine("---");
-                stringBuilder.AppendLine($"描述");
-                stringBuilder.AppendLine($"> {Regex.Replace(Regex.Replace(description.ToString(), "<[^>]+>", ""), "&[^;]+;", "")}");
+                stringBuilder.AppendLine($"> 描述");
+                stringBuilder.AppendLine();
+                stringBuilder.AppendLine($"{Regex.Replace(Regex.Replace(description.ToString(), "<[^>]+>", ""), "&[^;]+;", "")}");
                 stringBuilder.AppendLine();
             }
 
@@ -134,8 +131,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                     var ch = (ValueChangeModel)changeStatus;
                     if (ch.OldValue != ch.NewValue)
                     {
-                        stringBuilder.AppendLine("---");
-                        stringBuilder.AppendLine($"> 状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
+                        stringBuilder.AppendLine($"- 状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
                         stringBuilder.AppendLine();
                     }
                 }
@@ -151,8 +147,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                     var ch = (ValueChangeModel)changeAssignedTo;
                     if (ch.OldValue != ch.NewValue)
                     {
-                        stringBuilder.AppendLine("---");
-                        stringBuilder.AppendLine($"> 指派变更: {ch.OldValue} 更改为 @{ch.NewValue}");
+                        stringBuilder.AppendLine($"- 指派变更: {ch.OldValue} 更改为 @{ch.NewValue}");
                         stringBuilder.AppendLine();
                     }
                 }
@@ -166,9 +161,9 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             {
                 var strNohtml = Regex.Replace(Regex.Replace(history.ToString(), "<[^>]+>", ""), "&[^;]+;", "");
                 stringBuilder.AppendLine("---");
-                stringBuilder.AppendLine($"{revisedBy?.ToString()?.Split(' ')?[0]} 写了讨论");
+                stringBuilder.AppendLine($"> {revisedBy?.ToString()?.Split(' ')?[0]} 写了讨论");
                 stringBuilder.AppendLine();
-                stringBuilder.AppendLine($"> {strNohtml}");
+                stringBuilder.AppendLine($"{strNohtml}");
                 stringBuilder.AppendLine();
             }
             await _dingTalkService.Markdown($"{workItemType} #{workItemId} {title} {reason}", stringBuilder.ToString());
