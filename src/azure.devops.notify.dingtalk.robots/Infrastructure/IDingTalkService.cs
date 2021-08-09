@@ -3,6 +3,7 @@ using DingTalk.Api;
 using DingTalk.Api.Request;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,6 +42,7 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
                     Access_Token = c["access_token"],
                     Secret = c["secret"]
                 });
+                Console.WriteLine(JsonConvert.SerializeObject(mappings));
                 return mappings;
             }
         }
@@ -53,6 +55,7 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
                     DevOps = c["devops"],
                     DingTalk = c["dingtalk"]
                 });
+                Console.WriteLine(JsonConvert.SerializeObject(mappings));
                 return mappings;
             }
         }
