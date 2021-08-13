@@ -112,7 +112,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                     var ch = (ValueChangeModel)changeStatus;
                     if (ch.OldValue != ch.NewValue)
                     {
-                        stringBuilder.AppendLine($"- 📢状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
+                        stringBuilder.AppendLine($"- 状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
                         stringBuilder.AppendLine();
                     }
                 }
@@ -128,7 +128,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                     var ch = (ValueChangeModel)changeAssignedTo;
                     if (ch.OldValue != ch.NewValue)
                     {
-                        stringBuilder.AppendLine($"- 🙋‍指派变更: {ch.OldValue} 更改为 @{ch.NewValue}");
+                        stringBuilder.AppendLine($"- 指派变更: {ch.OldValue} 更改为 @{ch.NewValue}");
                         stringBuilder.AppendLine();
                     }
                 }
@@ -142,7 +142,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             {
                 var strNohtml = Regex.Replace(Regex.Replace(history.ToString(), "<[^>]+>", ""), "&[^;]+;", "");
                 stringBuilder.AppendLine("---");
-                stringBuilder.AppendLine($"> 📝{revisedBy?.ToString()?.Split(' ')?[0]} 写了讨论");
+                stringBuilder.AppendLine($"> {revisedBy?.ToString()?.Split(' ')?[0]} 写了讨论");
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($"{strNohtml}");
                 stringBuilder.AppendLine();
