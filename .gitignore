@@ -8,7 +8,6 @@
 *.user
 *.userosscache
 *.sln.docstates
-src/*/appsettings.Development.json
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
@@ -287,3 +286,4 @@ __pycache__/
 *.odx.cs
 *.xsd.cs
 /.vscode
+src/azure.devops.notify.dingtalk.robots/appsettings.Development.json
