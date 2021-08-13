@@ -14,57 +14,31 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
 {
     public interface IDingTalkService
     {
-        Task<string> Markdown(string title, string content, bool atAll = false);
+        void Markdown(string type, string title, string content, bool atAll = false);
+        [Obsolete("效果不是太好，会在钉钉内部打开侧边，不适合")]
         void ActionCard(string title, string content, string workItemUrl);
     }
     public class DingTalkService : IDingTalkService
     {
-        private readonly IConfiguration _configuration;
+        private readonly AppSettings _appSettings;
         private readonly ILogger<IDingTalkService> _logger;
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="configuration"></param>
+        /// <param name="appSettings"></param>
         /// <param name="logger"></param>
-        public DingTalkService(IConfiguration configuration, ILogger<IDingTalkService> logger)
+        public DingTalkService(AppSettings appSettings, ILogger<IDingTalkService> logger)
         {
-            _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
 
-        private IEnumerable<Robot> Roboots
-        {
-            get
-            {
-                var mappings = _configuration.GetSection("robots").GetChildren().Select(c => new Robot
-                {
-                    Name = c["Name"],
-                    Access_Token = c["access_token"],
-                    Secret = c["secret"]
-                });
-                Console.WriteLine(JsonConvert.SerializeObject(mappings));
-                return mappings;
-            }
-        }
-        private IEnumerable<UserMapping> UserMappings
-        {
-            get
-            {
-                var mappings = _configuration.GetSection("UserMappings").GetChildren().Select(c => new UserMapping
-                {
-                    DevOps = c["devops"],
-                    DingTalk = c["dingtalk"]
-                });
-                Console.WriteLine(JsonConvert.SerializeObject(mappings));
-                return mappings;
-            }
-        }
-
+        [Obsolete("效果不是太好，会在钉钉内部打开侧边，不适合")]
         public void ActionCard(string title, string content, string workItemUrl)
         {
             var timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            var allUsers = UserMappings.Select(t => new { t.DevOps, t.DingTalk }).Distinct();
-            foreach (var g in Roboots.GroupBy(t => new { t.Access_Token, t.Secret }))
+            var allUsers = _appSettings.DefaultUserMappings.Select(t => new { t.DevOps, t.DingTalk }).Distinct();
+            foreach (var g in _appSettings.Robots.GroupBy(t => new { t.Access_Token, t.Secret }))
             {
                 var signMsg = timestamp + "\n" + g.Key.Secret;
                 var sign = DingTalkSignatureUtil.ComputeSignature(g.Key.Secret, signMsg);
@@ -106,41 +80,55 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
                 _logger.LogInformation(response.Body);
             }
         }
-
-        public async Task<string> Markdown(string title, string content, bool atAll = false)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="atAll"></param>
+        /// <returns></returns>
+        public void Markdown(string type, string title, string content, bool atAll = false)
         {
             var timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            var allUsers = UserMappings.Select(t => new { t.DevOps, t.DingTalk }).Distinct();
-            foreach (var g in Roboots.GroupBy(t => new { t.Access_Token, t.Secret }))
+            foreach (var g in _appSettings.Robots.Where(t => t.Type.Contains(type)).Distinct())
             {
-                var signMsg = timestamp + "\n" + g.Key.Secret;
-                var sign = DingTalkSignatureUtil.ComputeSignature(g.Key.Secret, signMsg);
-                var url = $"https://oapi.dingtalk.com/robot/send?access_token={g.Key.Access_Token}&timestamp={timestamp}&sign={sign}";
+                var signMsg = timestamp + "\n" + g.Secret;
+                var sign = DingTalkSignatureUtil.ComputeSignature(g.Secret, signMsg);
+                var url = $"https://oapi.dingtalk.com/robot/send?access_token={g.Access_Token}&timestamp={timestamp}&sign={sign}";
                 IDingTalkClient client = new DefaultDingTalkClient(url);
                 OapiRobotSendRequest request = new() { Msgtype = "markdown" };
-                List<string> atPhones = new();
-                foreach (var d in allUsers)
+                List<string> at = new();
+                var ddTalks = (g.UserMappings.Any() ? g.UserMappings : _appSettings.DefaultUserMappings).AsQueryable();
+                if (g.AtOnly)
                 {
-                    if (content.Contains($"@{d.DevOps}"))
-                    {
-                        content = content.Replace($"@{d.DevOps}", $" @{d.DingTalk} ");
-                        atPhones.Add(d.DingTalk);
-                    }
+                    ddTalks = ddTalks.Where(t => content.Contains(t.DevOps));
                 }
-                request.Markdown_ = new()
+                var sender = !g.AtOnly || ddTalks.Any();
+                if (sender)
                 {
-                    Title = title,
-                    Text = content
-                };
-                request.At_ = new()
-                {
-                    AtMobiles = atPhones,
-                    IsAtAll = atAll
-                };
-                var response = client.Execute(request);
-                _logger.LogInformation(response.Body);
+                    foreach (var d in ddTalks)
+                    {
+                        if (content.Contains($"@{d.DevOps}"))
+                        {
+                            content = content.Replace($"@{d.DevOps}", $" @{d.DingTalk} ");
+                            at.Add(d.DingTalk);
+                        }
+                    }
+                    request.Markdown_ = new()
+                    {
+                        Title = title,
+                        Text = content
+                    };
+                    request.At_ = new()
+                    {
+                        AtMobiles = at,
+                        IsAtAll = atAll
+                    };
+                    var response = client.Execute(request);
+                    _logger.LogInformation(response.Body);
+                }
             }
-            return await Task.FromResult("");
         }
     }
 }

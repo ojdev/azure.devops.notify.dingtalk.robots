@@ -29,10 +29,26 @@ appsettings.json
     {
       "Name": "DevOps通知群",
       "access_token": "xxx",
-      "secret": "xxx"
+      "secret": "xxx",
+      "Type": [ "PR", "Task" ],
+      "AtOnly": true,
+      "UserMappings": [
+        {
+          "devops": "ABC",
+          "dingtalk": "18000000001"
+        },
+        {
+          "devops": "BCD",
+          "dingtalk": "18000000003"
+        },
+        {
+          "devops": "DEF",
+          "dingtalk": "18000000002"
+        }
+      ]
     }
   ],
-  "UserMappings": [
+  "DefaultUserMappings": [
     {
       "devops": "ABC",
       "dingtalk": "18000000001"

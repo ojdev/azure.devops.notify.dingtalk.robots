@@ -1,3 +1,4 @@
+using azure.devops.notify.dingtalk.robots.Dtos;
 using azure.devops.notify.dingtalk.robots.Infrastructure;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,9 +11,11 @@ namespace azure.devops.notify.dingtalk.robots
 {
     public class Startup
     {
+        public static AppSettings _appSettings;
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            _appSettings = new AppSettings();
         }
 
         public IConfiguration Configuration { get; }
@@ -20,6 +23,9 @@ namespace azure.devops.notify.dingtalk.robots
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+
+            Configuration.Bind(_appSettings);
+            services.AddSingleton<AppSettings>(_appSettings);
             services.AddControllers()
                 .AddNewtonsoftJson();
             services.AddScoped<IDingTalkService, DingTalkService>();

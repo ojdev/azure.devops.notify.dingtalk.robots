@@ -2,16 +2,12 @@
 using azure.devops.notify.dingtalk.robots.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
-using System.Dynamic;
-using System.Linq;
-using System.Collections;
-using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace azure.devops.notify.dingtalk.robots.Controllers
 {
@@ -53,13 +49,13 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             var reviews = request.Resource.Reviewers?.Select(t => $"@{t.displayName}").ToList() ?? new List<string>();
             if (reviews.Any())
             {
-                stringBuilder.AppendLine($"> 审阅者: {string.Join(' ', reviews)}");
+                stringBuilder.AppendLine($"> 审阅: {string.Join(' ', reviews)}");
                 stringBuilder.AppendLine("> ");
             }
             stringBuilder.AppendLine("---");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine(request.DetailedMessage.MarkDown);
-            await _dingTalkService.Markdown(request.Resource.Title, stringBuilder.ToString());
+            _dingTalkService.Markdown("PR", request.Resource.Title, stringBuilder.ToString());
             return Ok();
         }
         /// <summary>
@@ -116,7 +112,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                     var ch = (ValueChangeModel)changeStatus;
                     if (ch.OldValue != ch.NewValue)
                     {
-                        stringBuilder.AppendLine($"- 状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
+                        stringBuilder.AppendLine($"- 📢状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
                         stringBuilder.AppendLine();
                     }
                 }
@@ -132,7 +128,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                     var ch = (ValueChangeModel)changeAssignedTo;
                     if (ch.OldValue != ch.NewValue)
                     {
-                        stringBuilder.AppendLine($"- 指派变更: {ch.OldValue} 更改为 @{ch.NewValue}");
+                        stringBuilder.AppendLine($"- 🙋‍指派变更: {ch.OldValue} 更改为 @{ch.NewValue}");
                         stringBuilder.AppendLine();
                     }
                 }
@@ -146,19 +142,13 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             {
                 var strNohtml = Regex.Replace(Regex.Replace(history.ToString(), "<[^>]+>", ""), "&[^;]+;", "");
                 stringBuilder.AppendLine("---");
-                stringBuilder.AppendLine($"> {revisedBy?.ToString()?.Split(' ')?[0]} 写了讨论");
+                stringBuilder.AppendLine($"> 📝{revisedBy?.ToString()?.Split(' ')?[0]} 写了讨论");
                 stringBuilder.AppendLine();
                 stringBuilder.AppendLine($"{strNohtml}");
                 stringBuilder.AppendLine();
             }
-            await _dingTalkService.Markdown($"{workItemType} #{workItemId} {title} {reason}", stringBuilder.ToString());
-            return Ok();
-        }
-        [HttpPost]
-        public async Task<IActionResult> SendMessage(string title, string content, bool atAll = false)
-        {
-            await _dingTalkService.Markdown(title, content, atAll);
-            return Ok();
+            _dingTalkService.Markdown("Task", $"{workItemType} #{workItemId} {title} {reason}", stringBuilder.ToString());
+            return Ok($"{workItemId} is ok!");
         }
     }
 }
