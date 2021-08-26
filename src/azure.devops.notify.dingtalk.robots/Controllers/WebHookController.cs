@@ -17,12 +17,29 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
     {
         private readonly IDingTalkService _dingTalkService;
         private readonly ILogger<WebHookController> _logger;
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="dingTalkService"></param>
+        /// <param name="logger"></param>
         public WebHookController(IDingTalkService dingTalkService, ILogger<WebHookController> logger)
         {
             _dingTalkService = dingTalkService ?? throw new ArgumentNullException(nameof(dingTalkService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="status"></param>
+        /// <returns></returns>
+        public string RequestUpdatedStatus(string status) => status switch
+        {
+            "completed" => "已完成",
+            "active" => "激活",
+            "abandoned" => "已放弃",
+            _ => status,
+        };
+
         /// <summary>
         /// 拉取请求
         /// </summary>
@@ -41,9 +58,12 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             stringBuilder.AppendLine("---");
             stringBuilder.AppendLine($"> 仓储: {repository}");
             stringBuilder.AppendLine("> ");
-            stringBuilder.AppendLine($"> 合并: {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} {request.Resource.MergeStatus}");
+            stringBuilder.AppendLine($"> 合并: {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} {(request.Resource.MergeStatus == "conflicts" ? "[打叉]合并冲突" : "")}");
             stringBuilder.AppendLine("> ");
-            stringBuilder.AppendLine($"> 状态: {request.Resource.Status}");
+
+
+            //request.Resource.Status->completed,active,abandoned
+            stringBuilder.AppendLine($"> 状态: {RequestUpdatedStatus(request.Resource.Status)}");
             stringBuilder.AppendLine("> ");
 
             var reviews = request.Resource.Reviewers?.Select(t => $"@{t.displayName}").ToList() ?? new List<string>();
@@ -55,7 +75,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             stringBuilder.AppendLine("---");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine(request.DetailedMessage.MarkDown);
-            _dingTalkService.Markdown("PR", request.Resource.Title, stringBuilder.ToString());
+            await _dingTalkService.MarkdownAsync("PR", "", request.Resource.Title, stringBuilder.ToString());
             return Ok();
         }
         /// <summary>
@@ -89,11 +109,13 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             stringBuilder.AppendLine();
             stringBuilder.AppendLine($"> 修改: {revisedBy?.ToString()?.Split(' ')?[0]}");
             stringBuilder.AppendLine();
+
             if (assignedTo != null)
             {
                 stringBuilder.AppendLine($"> 指派: @{assignedTo?.ToString()?.Split(' ')?[0]}");
                 stringBuilder.AppendLine();
             }
+
             var description = request.Resource.Revision.Fields.GetValueOrDefault("System.Description");
             if (description != null)
             {
@@ -120,6 +142,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                 {
                 }
             }
+
             var changeAssignedTo = request.Resource.Fields.GetValueOrDefault("System.AssignedTo");
             if (changeAssignedTo != null)
             {
@@ -147,7 +170,8 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                 stringBuilder.AppendLine($"{strNohtml}");
                 stringBuilder.AppendLine();
             }
-            _dingTalkService.Markdown("Task", $"{workItemType} #{workItemId} {title} {reason}", stringBuilder.ToString());
+
+            await _dingTalkService.MarkdownAsync("Task", $"{workItemType}", $"{workItemType} #{workItemId} {title} {reason}", stringBuilder.ToString());
             return Ok($"{workItemId} is ok!");
         }
     }

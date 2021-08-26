@@ -1,6 +1,5 @@
-# azure.devops.notify.dingtalk.robots
-
-docker-compose.yml
+![Docker Automated build](https://img.shields.io/docker/automated/luacloud/devops.to.dingtalk.robots)  ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/luacloud/devops.to.dingtalk.robots)
+# docker-compose.yml
 ```yaml
 version: "2.0"
 services:
@@ -15,7 +14,7 @@ services:
       - 80:80
 ```
 
-appsettings.json
+# appsettings.json
 ```json
 {
   "Logging": {
@@ -30,7 +29,15 @@ appsettings.json
       "Name": "DevOps通知群",
       "access_token": "xxx",
       "secret": "xxx",
-      "Type": [ "PR", "Task" ],
+      "Types": [ 
+      {
+            "Type":"PR",
+            "WorkItemTypes":[],
+      },
+      {
+            "Type":"Task",
+            "WorkItemTypes":["用户情景","Bug","任务"],
+      }],     
       "AtOnly": true,
       "UserMappings": [
         {
@@ -64,3 +71,41 @@ appsettings.json
   ]
 }
 ```
+
+# robots
+
+## Name
+
+用来标识是哪一个通知机器人
+## access_token
+
+钉钉群机器人的token
+
+## secret
+
+为了安全性，所以只使用钉钉群机器人的secret
+
+## Types
+
+产生通知的类型，可以用来过滤是显示拉去请求的通知还是任务项的。
+### Type
+
+- PR: PR拉取请求
+- Task: 工作项
+### WorkItemTypes
+
+目前仅针对工作项中的内容，包括["用户情景","Bug","任务"]
+## AtOnly
+
+- true: 只@工作项中提到的人
+- false: @所有人
+# DefaultUserMappings & UserMappings
+
+当robots节点中的UserMappings为空集合的时候则使用DefaultUserMappings中的用户发起通知
+## devops
+
+AzureDevops中的用户名称
+
+## dingtalk
+
+dingtalk中的用户手机号，用来将AzureDevops中的用户在dingtalk显示@效果

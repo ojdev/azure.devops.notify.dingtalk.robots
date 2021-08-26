@@ -13,7 +13,12 @@ namespace azure.devops.notify.dingtalk.robots.Dtos
         public string Access_Token { get; set; }
         public string Secret { get; set; }
         public bool AtOnly { get; set; } = false;
-        public List<string> Type { get; set; } = new List<string>();
+        public List<WorkType> Types { get; set; } = new List<WorkType>();
         public List<UserMapping> UserMappings { get; set; } = new List<UserMapping>();
+    }
+    public class WorkType
+    {
+        public string Type { get; set; }
+        public List<string> WorkItemTypes { get; set; } = new List<string>();
     }
 }

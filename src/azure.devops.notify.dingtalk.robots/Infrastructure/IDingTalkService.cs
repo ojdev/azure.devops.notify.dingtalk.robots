@@ -1,9 +1,7 @@
 ﻿using azure.devops.notify.dingtalk.robots.Dtos;
 using DingTalk.Api;
 using DingTalk.Api.Request;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +12,7 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
 {
     public interface IDingTalkService
     {
-        void Markdown(string type, string title, string content, bool atAll = false);
+        Task MarkdownAsync(string type, string workItemType, string title, string content, bool atAll = false);
         [Obsolete("效果不是太好，会在钉钉内部打开侧边，不适合")]
         void ActionCard(string title, string content, string workItemUrl);
     }
@@ -32,7 +30,12 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
             _appSettings = appSettings ?? throw new ArgumentNullException(nameof(appSettings));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
         }
-
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="title"></param>
+        /// <param name="content"></param>
+        /// <param name="workItemUrl"></param>
         [Obsolete("效果不是太好，会在钉钉内部打开侧边，不适合")]
         public void ActionCard(string title, string content, string workItemUrl)
         {
@@ -84,14 +87,15 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
         /// 
         /// </summary>
         /// <param name="type"></param>
+        /// <param name="workItemType"></param>
         /// <param name="title"></param>
         /// <param name="content"></param>
         /// <param name="atAll"></param>
         /// <returns></returns>
-        public void Markdown(string type, string title, string content, bool atAll = false)
+        public async Task MarkdownAsync(string type, string workItemType, string title, string content, bool atAll = false)
         {
             var timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
-            foreach (var g in _appSettings.Robots.Where(t => t.Type.Contains(type)).Distinct())
+            foreach (var g in _appSettings.Robots.Where(t => t.Types.Any(x => x.Type == type && (!x.WorkItemTypes.Any() || x.WorkItemTypes.Contains(workItemType)))).Distinct())
             {
                 var signMsg = timestamp + "\n" + g.Secret;
                 var sign = DingTalkSignatureUtil.ComputeSignature(g.Secret, signMsg);
@@ -123,9 +127,10 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
                     request.At_ = new()
                     {
                         AtMobiles = at,
-                        IsAtAll = atAll
+                        IsAtAll = !g.AtOnly
                     };
                     var response = client.Execute(request);
+                    await Task.Yield();
                     _logger.LogInformation(response.Body);
                 }
             }
