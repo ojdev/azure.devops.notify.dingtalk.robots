@@ -1,4 +1,5 @@
 ﻿using azure.devops.notify.dingtalk.robots.AzureDevOps;
+using azure.devops.notify.dingtalk.robots.Dtos;
 using azure.devops.notify.dingtalk.robots.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -17,16 +18,20 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
     {
         private readonly IDingTalkService _dingTalkService;
         private readonly ILogger<WebHookController> _logger;
+        private readonly AppSettings _settings;
         /// <summary>
         /// 
         /// </summary>
         /// <param name="dingTalkService"></param>
         /// <param name="logger"></param>
-        public WebHookController(IDingTalkService dingTalkService, ILogger<WebHookController> logger)
+        /// <param name="settings"></param>
+        public WebHookController(IDingTalkService dingTalkService, ILogger<WebHookController> logger, AppSettings settings)
         {
             _dingTalkService = dingTalkService ?? throw new ArgumentNullException(nameof(dingTalkService));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _settings = settings ?? throw new ArgumentNullException(nameof(settings));
         }
+
         /// <summary>
         /// 
         /// </summary>
@@ -100,7 +105,6 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             var revisedBy = request.Resource.RevisedBy.DisplayName;
             var title = request.Resource.Revision.Fields.GetValueOrDefault("System.Title")?.ToString();
             string html = request.Resource.Links.GetValueOrDefault("html")?.Href;
-
             StringBuilder stringBuilder = new();
             stringBuilder.AppendLine($"#### [{workItemType}] #{workItemId} {state} [{title}]({html})");
             stringBuilder.AppendLine();
@@ -171,6 +175,82 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                 stringBuilder.AppendLine();
             }
 
+            var priority = request.Resource.Fields.GetValueOrDefault("Microsoft.VSTS.Common.Priority");
+            var remainingWork = request.Resource.Fields.GetValueOrDefault("Microsoft.VSTS.Scheduling.RemainingWork");
+            var originalEstimate = request.Resource.Fields.GetValueOrDefault("Microsoft.VSTS.Scheduling.OriginalEstimate");
+            if (priority != null || remainingWork != null || originalEstimate != null)
+            {
+                stringBuilder.AppendLine("---");
+                if (priority != null)
+                {
+                    try
+                    {
+                        var ch = (ValueChangeModel)priority;
+                        if (ch.OldValue != ch.NewValue)
+                        {
+                            stringBuilder.AppendLine($"> 优先级: {ch.OldValue} 更改为 {ch.NewValue}");
+                            stringBuilder.AppendLine();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+                if (remainingWork != null)
+                {
+                    try
+                    {
+                        var ch = (ValueChangeModel)remainingWork;
+                        if (ch.OldValue != ch.NewValue)
+                        {
+                            stringBuilder.AppendLine($"> 剩余工作: {ch.OldValue} 更改为 {ch.NewValue}");
+                            stringBuilder.AppendLine();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+                if (originalEstimate != null)
+                {
+                    try
+                    {
+                        var ch = (ValueChangeModel)originalEstimate;
+                        if (ch.OldValue != ch.NewValue)
+                        {
+                            stringBuilder.AppendLine($"> 初始估计: {ch.OldValue} 更改为 {ch.NewValue}");
+                            stringBuilder.AppendLine();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+
+            if (request.Resource.Fields.Keys.Any(x => _settings.WorkItemCustomNodes.Any(t => t.Key == x)))
+            {
+                stringBuilder.AppendLine("---");
+                foreach (var setting in _settings.WorkItemCustomNodes)
+                {
+                    var node = request.Resource.Fields.GetValueOrDefault(setting.Key);
+                    if (node != null)
+                    {
+                        try
+                        {
+                            var ch = (ValueChangeModel)node;
+                            if (ch.OldValue != ch.NewValue)
+                            {
+                                stringBuilder.AppendLine($"> {setting.Name}: {ch.OldValue} 更改为 {ch.NewValue}");
+                                stringBuilder.AppendLine();
+                            }
+                        }
+                        catch
+                        {
+                        }
+                    }
+                }
+            }
             await _dingTalkService.MarkdownAsync("Task", $"{workItemType}", $"{workItemType} #{workItemId} {title} {reason}", stringBuilder.ToString());
             return Ok($"{workItemId} is ok!");
         }

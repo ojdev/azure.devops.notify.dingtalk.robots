@@ -6,6 +6,7 @@ namespace azure.devops.notify.dingtalk.robots.Dtos
     {
         public List<RobotConfiguration> Robots { get; set; } = new List<RobotConfiguration>();
         public List<UserMapping> DefaultUserMappings { get; set; } = new List<UserMapping>();
+        public List<CustomNode> WorkItemCustomNodes { get; set; } = new List<CustomNode>();
     }
     public class RobotConfiguration
     {
@@ -20,5 +21,13 @@ namespace azure.devops.notify.dingtalk.robots.Dtos
     {
         public string Type { get; set; }
         public List<string> WorkItemTypes { get; set; } = new List<string>();
+    }
+    /// <summary>
+    /// AzureDevops中的自定义内容
+    /// </summary>
+    public class CustomNode
+    {
+        public string Key { get; set; }
+        public string Name { get; set; }
     }
 }

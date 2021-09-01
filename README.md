@@ -24,6 +24,9 @@ services:
       "Microsoft.Hosting.Lifetime": "Information"
     }
   },
+  "workItemCustomNodes": [
+    {"key":"xxx","name":"名字"}
+  ],
   "robots": [
     {
       "Name": "DevOps通知群",
