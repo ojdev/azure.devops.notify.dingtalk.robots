@@ -30,6 +30,8 @@ jobs:
         file: ./src/azure.devops.notify.dingtalk.robots/Dockerfile
         platforms: linux/amd64
         push: true
-        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:latest
+        tags: |
+          ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:latest
+          ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:$GITHUB_RUN_NUMBER
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
