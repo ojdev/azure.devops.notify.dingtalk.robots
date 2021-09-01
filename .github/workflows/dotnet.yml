@@ -12,6 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TZ: Asia/Shanghai
+      TAG_NUMBER: $GITHUB_RUN_NUMBER
     steps:
     - uses: actions/checkout@v2
     - name: Docker Setup QEMU
@@ -32,6 +33,5 @@ jobs:
         push: true
         tags: |
           ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:latest
-          ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:$GITHUB_RUN_NUMBER
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
