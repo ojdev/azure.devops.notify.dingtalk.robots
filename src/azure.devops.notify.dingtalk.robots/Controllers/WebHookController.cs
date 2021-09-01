@@ -3,6 +3,7 @@ using azure.devops.notify.dingtalk.robots.Dtos;
 using azure.devops.notify.dingtalk.robots.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -135,7 +136,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             {
                 try
                 {
-                    var ch = (ValueChangeModel)changeStatus;
+                    var ch = changeStatus.ToValueChangeModel();
                     if (ch.OldValue != ch.NewValue)
                     {
                         stringBuilder.AppendLine($"- 状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
@@ -152,7 +153,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             {
                 try
                 {
-                    var ch = (ValueChangeModel)changeAssignedTo;
+                    var ch = changeAssignedTo.ToValueChangeModel();
                     if (ch.OldValue != ch.NewValue)
                     {
                         stringBuilder.AppendLine($"- 指派变更: {ch.OldValue} 更改为 @{ch.NewValue}");
@@ -185,7 +186,8 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                 {
                     try
                     {
-                        var ch = (ValueChangeModel)priority;
+
+                        var ch = priority.ToValueChangeModel();
                         if (ch.OldValue != ch.NewValue)
                         {
                             stringBuilder.AppendLine($"> 优先级: {ch.OldValue} 更改为 {ch.NewValue}");
@@ -200,7 +202,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                 {
                     try
                     {
-                        var ch = (ValueChangeModel)remainingWork;
+                        var ch = remainingWork.ToValueChangeModel();
                         if (ch.OldValue != ch.NewValue)
                         {
                             stringBuilder.AppendLine($"> 剩余工作: {ch.OldValue} 更改为 {ch.NewValue}");
@@ -215,7 +217,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                 {
                     try
                     {
-                        var ch = (ValueChangeModel)originalEstimate;
+                        var ch = originalEstimate.ToValueChangeModel();
                         if (ch.OldValue != ch.NewValue)
                         {
                             stringBuilder.AppendLine($"> 初始估计: {ch.OldValue} 更改为 {ch.NewValue}");
@@ -238,7 +240,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                     {
                         try
                         {
-                            var ch = (ValueChangeModel)node;
+                            var ch = node.ToValueChangeModel();
                             if (ch.OldValue != ch.NewValue)
                             {
                                 stringBuilder.AppendLine($"> {setting.Name}: {ch.OldValue} 更改为 {ch.NewValue}");
