@@ -131,40 +131,6 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                 stringBuilder.AppendLine();
             }
 
-            var changeStatus = request.Resource.Fields.GetValueOrDefault("System.State");
-            if (changeStatus != null)
-            {
-                try
-                {
-                    var ch = changeStatus.ToValueChangeModel();
-                    if (ch.OldValue != ch.NewValue)
-                    {
-                        stringBuilder.AppendLine($"- 状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
-                        stringBuilder.AppendLine();
-                    }
-                }
-                catch
-                {
-                }
-            }
-
-            var changeAssignedTo = request.Resource.Fields.GetValueOrDefault("System.AssignedTo");
-            if (changeAssignedTo != null)
-            {
-                try
-                {
-                    var ch = changeAssignedTo.ToValueChangeModel();
-                    if (ch.OldValue != ch.NewValue)
-                    {
-                        stringBuilder.AppendLine($"- 指派变更: {ch.OldValue} 更改为 @{ch.NewValue}");
-                        stringBuilder.AppendLine();
-                    }
-                }
-                catch
-                {
-                }
-            }
-
             var history = request.Resource.Revision.Fields.GetValueOrDefault("System.History");
             if (history != null)
             {
@@ -176,6 +142,8 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                 stringBuilder.AppendLine();
             }
 
+            var changeStatus = request.Resource.Fields.GetValueOrDefault("System.State");
+            var changeAssignedTo = request.Resource.Fields.GetValueOrDefault("System.AssignedTo");
             var priority = request.Resource.Fields.GetValueOrDefault("Microsoft.VSTS.Common.Priority");
             var remainingWork = request.Resource.Fields.GetValueOrDefault("Microsoft.VSTS.Scheduling.RemainingWork");
             var originalEstimate = request.Resource.Fields.GetValueOrDefault("Microsoft.VSTS.Scheduling.OriginalEstimate");
@@ -191,6 +159,36 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                         if (ch.OldValue != ch.NewValue)
                         {
                             stringBuilder.AppendLine($"> 优先级: {ch.OldValue} 更改为 {ch.NewValue}");
+                            stringBuilder.AppendLine();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+                if (changeStatus != null)
+                {
+                    try
+                    {
+                        var ch = changeStatus.ToValueChangeModel();
+                        if (ch.OldValue != ch.NewValue)
+                        {
+                            stringBuilder.AppendLine($"> 状态变更: {ch.OldValue} 更改为 {ch.NewValue}");
+                            stringBuilder.AppendLine();
+                        }
+                    }
+                    catch
+                    {
+                    }
+                }
+                if (changeAssignedTo != null)
+                {
+                    try
+                    {
+                        var ch = changeAssignedTo.ToValueChangeModel();
+                        if (ch.OldValue != ch.NewValue)
+                        {
+                            stringBuilder.AppendLine($"> 指派变更: {$"{ch.OldValue}".Split(' ')?[0]} 更改为 @{$"{ch.NewValue}".Split(' ')?[0]}");
                             stringBuilder.AppendLine();
                         }
                     }
@@ -243,6 +241,13 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
                             var ch = node.ToValueChangeModel();
                             if (ch.OldValue != ch.NewValue)
                             {
+                                var o = $"{ch.OldValue}";
+                                var n = $"{ch.NewValue}";
+                                if (!string.IsNullOrWhiteSpace(setting.Format))
+                                {
+                                    o = string.Format($"{{0:{setting.Format}}}", o);
+                                    n = string.Format($"{{0:{setting.Format}}}", n);
+                                }
                                 stringBuilder.AppendLine($"> {setting.Name}: {ch.OldValue} 更改为 {ch.NewValue}");
                                 stringBuilder.AppendLine();
                             }

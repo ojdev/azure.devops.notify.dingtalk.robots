@@ -29,5 +29,6 @@ namespace azure.devops.notify.dingtalk.robots.Dtos
     {
         public string Key { get; set; }
         public string Name { get; set; }
+        public string Format { get; set; }
     }
 }
