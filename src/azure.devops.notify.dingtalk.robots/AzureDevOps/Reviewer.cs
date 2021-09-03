@@ -2,10 +2,11 @@
 {
     public class Reviewer
     {
-        public string reviewerUrl { get; set; }
-        public int vote { get; set; }
-        public string displayName { get; set; }
+        public string ReviewerUrl { get; set; }
+        public int Vote { get; set; }
+        public string DisplayName { get; set; }
         public string Url { get; set; }
+        public bool? IsRequired { get; set; }
 
     }
 }

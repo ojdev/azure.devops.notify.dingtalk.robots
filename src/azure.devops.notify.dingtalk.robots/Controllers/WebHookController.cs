@@ -45,7 +45,14 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             "abandoned" => "已放弃",
             _ => status,
         };
-
+        public string ReviewStatus(int vote) => vote switch
+        {
+            -10 => " [拒绝]",
+            -5 => " [无聊]",
+            5 => " [会议]",
+            10 => " [OK]",
+            _ => ""
+        };
         /// <summary>
         /// 拉取请求
         /// </summary>
@@ -59,10 +66,12 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             string repository = request.Resource.Repository.Name;
 
             StringBuilder stringBuilder = new();
-            stringBuilder.AppendLine($"#### [#{request.Resource.CodeReviewId} {createdBy} {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} 分支的拉取请求]({html})");
+            stringBuilder.AppendLine($"#### [#{request.Resource.CodeReviewId} {repository} 产生了 {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} 的拉取请求]({html})");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine("---");
             stringBuilder.AppendLine($"> 仓储: {repository}");
+            stringBuilder.AppendLine("> ");
+            stringBuilder.AppendLine($"> 创建: @{createdBy}");
             stringBuilder.AppendLine("> ");
             stringBuilder.AppendLine($"> 合并: {request.Resource.SourceRefName.Replace("refs/heads/", "")} 到 {request.Resource.TargetRefName.Replace("refs/heads/", "")} {(request.Resource.MergeStatus == "conflicts" ? "[打叉]合并冲突" : "")}");
             stringBuilder.AppendLine("> ");
@@ -71,12 +80,21 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             //request.Resource.Status->completed,active,abandoned
             stringBuilder.AppendLine($"> 状态: {RequestUpdatedStatus(request.Resource.Status)}");
             stringBuilder.AppendLine("> ");
-
-            var reviews = request.Resource.Reviewers?.Select(t => $"@{t.displayName}").ToList() ?? new List<string>();
-            if (reviews.Any())
+            if (request.Resource.Reviewers.Any())
             {
-                stringBuilder.AppendLine($"> 审阅: {string.Join(' ', reviews)}");
-                stringBuilder.AppendLine("> ");
+                stringBuilder.AppendLine("---");
+                var requiredreviews = request.Resource.Reviewers?.Where(t => t.IsRequired == true)?.Select(t => $"@{t.DisplayName}{ReviewStatus(t.Vote)}").ToList() ?? new List<string>();
+                if (requiredreviews.Any())
+                {
+                    stringBuilder.AppendLine($"> 审阅-必须: {string.Join(" 、", requiredreviews)}");
+                    stringBuilder.AppendLine("> ");
+                }
+                var reviews = request.Resource.Reviewers?.Where(t => t.IsRequired != true)?.Select(t => $"@{t.DisplayName}{ReviewStatus(t.Vote)}").ToList() ?? new List<string>();
+                if (reviews.Any())
+                {
+                    stringBuilder.AppendLine($"> 审阅-可选: {string.Join(" 、", reviews)}");
+                    stringBuilder.AppendLine("> ");
+                }
             }
             stringBuilder.AppendLine("---");
             stringBuilder.AppendLine();

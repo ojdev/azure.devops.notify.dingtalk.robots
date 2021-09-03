@@ -19,7 +19,7 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
         public Commit LastMergeSourceCommit { get; set; }
         public Commit LastMergeTargetCommit { get; set; }
         public Commit LastMergeCommit { get; set; }
-        public List<Reviewer> Reviewers { get; set; }
+        public List<Reviewer> Reviewers { get; set; } = new List<Reviewer>();
         public List<Commit> Commits { get; set; }
         public string Url { get; set; }
         [JsonProperty("_links")]
