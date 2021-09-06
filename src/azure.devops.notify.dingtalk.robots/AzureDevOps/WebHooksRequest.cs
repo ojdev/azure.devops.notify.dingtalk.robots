@@ -12,6 +12,10 @@ namespace azure.devops.notify.dingtalk.robots.AzureDevOps
     public class WebHooksRequestWorkitemUpdatedResource : WebHooksRequest<WorkitemUpdatedResource>
     {
     }
+    public class ReleaseUpdateInputDto
+    {
+        public DetailedMessage DetailedMessage { get; set; }
+    }
     public class WebHooksRequestInputDto
     {
         public string SubscriptionId { get; set; }

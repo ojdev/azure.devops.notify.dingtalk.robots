@@ -1,4 +1,6 @@
 ![Docker Automated build](https://img.shields.io/docker/automated/luacloud/devops.to.dingtalk.robots)  ![Docker Cloud Build Status](https://img.shields.io/docker/cloud/build/luacloud/devops.to.dingtalk.robots)
+
+[](https://developers.dingtalk.com/document/robots/custom-robot-access)
 # docker-compose.yml
 ```yaml
 version: "2.0"
