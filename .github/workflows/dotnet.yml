@@ -2,9 +2,8 @@ name: .NET Core App CI to Docker Hub
 
 on:
   push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+    tags:
+    - v*
 
 jobs:
   build:
@@ -24,6 +23,12 @@ jobs:
       with:
         Username: ${{ secrets.DOCKER_HUB_USERNAME }}
         Password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
+    - name: Get tag
+      id: tag
+      uses: dawidd6/action-get-tag@v1
+      with:
+        # Optionally strip `v` prefix
+        strip_v: true
     - name: Build and push
       uses: docker/build-push-action@v2.6.1
       with:
@@ -31,7 +36,6 @@ jobs:
         file: ./src/azure.devops.notify.dingtalk.robots/Dockerfile
         platforms: linux/amd64
         push: true
-        tags: |
-          ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:latest
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:latest,${{ secrets.DOCKER_HUB_USERNAME }}/devops.to.dingtalk.robots:${{steps.tag.outputs.tag}}
     - name: Image digest
       run: echo ${{ steps.docker_build.outputs.digest }}
