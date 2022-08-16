@@ -59,7 +59,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         /// <param name="request"></param>
         /// <returns></returns>
         [HttpPost]
-        public async Task<IActionResult> ReleaseUpdated([FromBody] WebHooksRequestPullRequestUpdatedResource request)
+        public async Task<IActionResult> ReleaseUpdated([FromBody] WebHooksRequestDeployCreatedResource request)
         {
             /*
              {
@@ -94,6 +94,23 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
     },
     "createdDate": "2021-09-03T13:52:32.171Z"
 }*/
+
+            string html = request.Resource?.Deployment?.ReleaseDefinition?.GetWebUrl;
+            string repository = request.Resource?.Deployment?.ReleaseDefinition?.Name;
+
+            StringBuilder stringBuilder = new();
+            stringBuilder.AppendLine($"#### [# {repository} 触发自动部署]({html})");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine("---");
+            stringBuilder.AppendLine($"> 阶段: {request.Resource?.Environment?.Name}");
+            stringBuilder.AppendLine("> ");
+            stringBuilder.AppendLine($"> 状态: {request.Resource?.Environment?.Status}");
+            stringBuilder.AppendLine("> ");
+
+            stringBuilder.AppendLine("---");
+            stringBuilder.AppendLine();
+            stringBuilder.AppendLine(request.DetailedMessage.MarkDown);
+            await _dingTalkService.MarkdownAsync("PR", "", $"{repository} 触发自动部署", stringBuilder.ToString());
             return Ok();
         }
         /// <summary>

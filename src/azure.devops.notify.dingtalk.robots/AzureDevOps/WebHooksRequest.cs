@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace azure.devops.notify.dingtalk.robots.AzureDevOps
 {
+    public class WebHooksRequestDeployCreatedResource : WebHooksRequest<DeployReauestCreatedResource>
+    {
+    }
     public class WebHooksRequestPullRequestCreatedResource : WebHooksRequest<PullRequestCreatedResource>
     {
     }
