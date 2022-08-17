@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace azure.devops.notify.dingtalk.robots.AzureDevOps
 {
-    public class ReleaseDefinition
+    public class NameLinks
     {
         public string Name { get; set; }
         [JsonProperty("_links")]

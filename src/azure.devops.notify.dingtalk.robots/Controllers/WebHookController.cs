@@ -61,47 +61,15 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
         [HttpPost]
         public async Task<IActionResult> ReleaseUpdated([FromBody] WebHooksRequestDeployCreatedResource request)
         {
-            /*
-             {
-    "id": "487c2c58-a83c-44c1-8732-3c99975defb2",
-    "eventType": "ms.vss-release.deployment-approval-pending-event",
-    "publisherId": "rm",
-    "message": {
-        "text": "阶段 prod 上的发布 2109011 尚待 预先部署 审批。",
-        "html": "阶段 <a href='https://team.lujing.tech/NewSoftCollection/XXXProject/_release?_a=environment-summary&definitionId=45&definitionEnvironmentId=361'>prod</a> 上的发布 <a href='https://team.lujing.tech/NewSoftCollection/XXXProject/_release?releaseId=17455&_a=release-summary'>2109011</a> 尚待 预先部署 审批。",
-        "markdown": "[prod](https://team.lujing.tech/NewSoftCollection/XXXProject/_release?_a=environment-summary&definitionId=45&definitionEnvironmentId=361)上的发布 [2109011](https://team.lujing.tech/NewSoftCollection/XXXProject/_release?releaseId=17455&_a=release-summary)尚待 预先部署 审批"
-    },
-    "detailedMessage": {
-        "text": "阶段 prod 上的发布 2109011 尚待 预先部署 审批。\r\n待定位置: 杜建鹏\r\n待定开始时间: 03-September-2021 01:52:24 PM (UTC)",
-        "html": "阶段 <a href='https://team.lujing.tech/NewSoftCollection/XXXProject/_release?_a=environment-summary&definitionId=45&definitionEnvironmentId=361'>prod</a> 上的发布 <a href='https://team.lujing.tech/NewSoftCollection/XXXProject/_release?releaseId=17455&_a=release-summary'>2109011</a> 尚待 预先部署 审批。<br>待定位置: 杜建鹏<br>待定开始时间: 03-September-2021 01:52:24 PM (UTC)",
-        "markdown": "阶段 [prod](https://team.lujing.tech/NewSoftCollection/XXXProject/_release?_a=environment-summary&definitionId=45&definitionEnvironmentId=361) 上的发布 [2109011](https://team.lujing.tech/NewSoftCollection/XXXProject/_release?releaseId=17455&_a=release-summary) 尚待 预先部署 审批。\r\n待定位置: 杜建鹏\r\n待定开始时间: 03-September-2021 01:52:24 PM (UTC)"
-    },
-    "resource": "由于大小限制，历史记录中不会显示资源详细信息",
-    "resourceVersion": "3.0-preview.1",
-    "resourceContainers": {
-        "collection": {
-            "id": "196f1fb9-5cca-476e-bf6b-1bfc354d09c7",
-            "baseUrl": "https://team.lujing.tech/NewSoftCollection/"
-        },
-        "server": {
-            "id": "93ebc1b4-e4e0-4d53-8037-4905cd8a4cb6",
-            "baseUrl": "https://team.lujing.tech/"
-        },
-        "project": {
-            "id": "4993cbb2-cf7e-4796-9844-9a36b1aec4b3",
-            "baseUrl": "https://team.lujing.tech/NewSoftCollection/"
-        }
-    },
-    "createdDate": "2021-09-03T13:52:32.171Z"
-}*/
-
             string html = request.Resource?.Deployment?.ReleaseDefinition?.GetWebUrl;
             string repository = request.Resource?.Deployment?.ReleaseDefinition?.Name;
 
             StringBuilder stringBuilder = new();
-            stringBuilder.AppendLine($"#### [# {repository} 触发自动部署]({html})");
+            stringBuilder.AppendLine($"#### [#{request.Resource?.Deployment?.Release?.Name} {repository} 触发自动部署]({html})");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine("---");
+            stringBuilder.AppendLine($"> 发起: @{request.Resource?.Deployment?.RequestedFor?.DisplayName}");
+            stringBuilder.AppendLine("> ");
             stringBuilder.AppendLine($"> 阶段: {request.Resource?.Environment?.Name}");
             stringBuilder.AppendLine("> ");
             stringBuilder.AppendLine($"> 状态: {request.Resource?.Environment?.Status}");
@@ -109,7 +77,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
 
             stringBuilder.AppendLine("---");
             stringBuilder.AppendLine();
-            stringBuilder.AppendLine(request.DetailedMessage.MarkDown);
+            stringBuilder.AppendLine(request.Message.MarkDown);
             await _dingTalkService.MarkdownAsync("CICD", "CD", $"{repository} 触发自动部署", stringBuilder.ToString());
             return Ok();
         }

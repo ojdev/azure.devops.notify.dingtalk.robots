@@ -4,6 +4,6 @@
     {
         public int Id { get; set; }
         public string Url { get; set; }
-        public RequestedFor RequestedFor { get; set; }
+        public By RequestedFor { get; set; }
     }
 }

@@ -12,7 +12,7 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
 {
     public interface IDingTalkService
     {
-        Task MarkdownAsync(string type, string workItemType, string title, string content, bool atAll = false);
+        Task MarkdownAsync(string type, string workItemType, string title, string content);
         [Obsolete("效果不是太好，会在钉钉内部打开侧边，不适合")]
         void ActionCard(string title, string content, string workItemUrl);
     }
@@ -90,9 +90,8 @@ namespace azure.devops.notify.dingtalk.robots.Infrastructure
         /// <param name="workItemType"></param>
         /// <param name="title"></param>
         /// <param name="content"></param>
-        /// <param name="atAll"></param>
         /// <returns></returns>
-        public async Task MarkdownAsync(string type, string workItemType, string title, string content, bool atAll = false)
+        public async Task MarkdownAsync(string type, string workItemType, string title, string content)
         {
             var timestamp = DateTimeOffset.Now.ToUnixTimeMilliseconds();
             foreach (var g in _appSettings.Robots.Where(t => t.Types.Any(x => x.Type == type && (!x.WorkItemTypes.Any() || x.WorkItemTypes.Contains(workItemType)))).Distinct())
