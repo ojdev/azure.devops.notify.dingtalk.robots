@@ -110,7 +110,7 @@ namespace azure.devops.notify.dingtalk.robots.Controllers
             stringBuilder.AppendLine("---");
             stringBuilder.AppendLine();
             stringBuilder.AppendLine(request.DetailedMessage.MarkDown);
-            await _dingTalkService.MarkdownAsync("PR", "", $"{repository} 触发自动部署", stringBuilder.ToString());
+            await _dingTalkService.MarkdownAsync("CICD", "CD", $"{repository} 触发自动部署", stringBuilder.ToString());
             return Ok();
         }
         /// <summary>
